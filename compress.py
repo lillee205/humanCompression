@@ -16,12 +16,19 @@ def colorQuantizeImg(img, numColors):
 def sampleImg(img):
     pass
 
-def isHuman(img):
-    pass 
+def isHuman(img, orig_coordinates):
+    ''' inputs:     img, pathname of file
+                    orig_coordinates, a 4-tuple of the top-left and bottom-right coords of the face
+        outputs:    True, if the new coordinates are close to orig_coordinates
+                    False otherwise
+    '''
+    new_coords = haar_cascade(img)
+    width, height = new_coords[2] - new_coords[0], new_coords[1] - new_coords[3]
+    # if new_coords
 
 def haar_cascade(img):
     ''' inputs:     img, the pathname of the img
-        outputs:    a list containing the top-left and bottom-right coordinates of the face
+        outputs:    a 4-tuple containing the top-left and bottom-right coordinates of the face
     '''
     classifier = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     img = cv2.imread(img)
@@ -33,20 +40,24 @@ def haar_cascade(img):
         x, y, w, h = result
         x1, y1 = x + w, y + h
         # cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
-        return [x, y, x1, y1] # top-left-x, top-left-y, bottom-right-x, bottom-right-y
-    return [0, 0, 0, 0]
+        return (x, y, x1, y1) # top-left-x, top-left-y, bottom-right-x, bottom-right-y
+    return (0, 0, 0, 0)
 
 def main(portraits, option = "color_quantization"):
     # loop through each portrait
     for portrait in portraits:
         flag = False
+        
+        # run haar_cascade on orig file
+        orig_coordinates = haar_cascade(portrait)
+
         # make a copy of the file
         shutil.copyfile(portrait, "compressed_" + portrait)
         portrait = "compressed_" + portrait
         numColors = 255
         while flag and numColors > 25: 
             # check if portrait is identifiable as human
-            if isHuman(portrait):
+            if isHuman(portrait, orig_coordinates):
                 if option == "color_quantization":
                     newImg = colorQuantizeImg(portrait, numColors - 25)
                     newImg.save("./photos/" + portrait)
