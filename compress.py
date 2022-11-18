@@ -8,9 +8,10 @@ def colorQuantizeImg(img, numColors):
                numColors is an int saying how many colors we want
         output: PIL img of newly color quantized portrait
     """
-    pilImg = Image.quantize(colors=numColors, method = None, kmeans = 0,
-    palette = None)
-    return pilImg
+    pilImg = Image.open("./photos/" + img) 
+    compImg = pilImg.quantize(colors=numColors, method = None, kmeans = 0,
+    palette = None).convert('RGB')
+    return compImg
 
 def sampleImg(img):
     pass
@@ -48,7 +49,7 @@ def main(portraits, option = "color_quantization"):
             if isHuman(portrait):
                 if option == "color_quantization":
                     newImg = colorQuantizeImg(portrait, numColors - 25)
-                    newImg.save(portrait)
+                    newImg.save("./photos/" + portrait)
                 elif option == "sampling":
                     pass 
                 else:
