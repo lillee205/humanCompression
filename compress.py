@@ -1,6 +1,7 @@
 from PIL import Image
 import os 
 import shutil
+import cv2
 
 def colorQuantizeImg(img, numColors):
     """ input: img is a string representing a filename to a portrait
@@ -16,6 +17,23 @@ def sampleImg(img):
 
 def isHuman(img):
     pass 
+
+def haar_cascade(img):
+    ''' inputs:     img, the pathname of the img
+        outputs:    a list containing the top-left and bottom-right coordinates of the face
+    '''
+    classifier = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    img = cv2.imread(img)
+    faces = classifier.detectMultiScale(img) # result
+    # to draw faces on image
+    print(faces)
+    if len(faces) > 0:
+        result = faces[0]
+        x, y, w, h = result
+        x1, y1 = x + w, y + h
+        # cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
+        return [x, y, x1, y1] # top-left-x, top-left-y, bottom-right-x, bottom-right-y
+    return [0, 0, 0, 0]
 
 def main(portraits, option = "color_quantization"):
     # loop through each portrait
