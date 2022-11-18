@@ -1,8 +1,15 @@
 from PIL import Image
 import os 
+import shutil
 
-def colorQuantizeImg(img):
-    pass 
+def colorQuantizeImg(img, numColors):
+    """ input: img is a string representing a filename to a portrait
+               numColors is an int saying how many colors we want
+        output: PIL img of newly color quantized portrait
+    """
+    pilImg = Image.quantize(colors=numColors, method = None, kmeans = 0,
+    palette = None)
+    return pilImg
 
 def sampleImg(img):
     pass
@@ -14,11 +21,16 @@ def main(portraits, option = "color_quantization"):
     # loop through each portrait
     for portrait in portraits:
         flag = False
-        while flag: 
+        # make a copy of the file
+        shutil.copyfile(portrait, "compressed_" + portrait)
+        portrait = "compressed_" + portrait
+        numColors = 255
+        while flag and numColors > 25: 
             # check if portrait is identifiable as human
             if isHuman(portrait):
                 if option == "color_quantization":
-                    pass 
+                    newImg = colorQuantizeImg(portrait, numColors - 25)
+                    newImg.save(portrait)
                 elif option == "sampling":
                     pass 
                 else:
