@@ -16,15 +16,26 @@ def colorQuantizeImg(img, numColors):
 def sampleImg(img):
     pass
 
-def isHuman(img, orig_coords):
+def isHuman(img, orig_coords, scale = False):
     ''' inputs:     img, pathname of file
                     orig_coordinates, a 4-tuple of the top-left and bottom-right coords of the face
+                    scale,  a bool indicating whether we are scaling the image (i.e., reducing the 
+                            number of pixels in the image)
         outputs:    True, if the new coordinates are close to orig_coordinates
                     False otherwise
     '''
     new_coords = haar_cascade(img)
     width, height = abs(new_coords[2] - new_coords[0]), abs(new_coords[1] - new_coords[3])
-    return (orig_coords[0] - width*0.1 <= new_coords[0] <= orig_coords[0] + width*0.1) and (orig_coords[1] - height*0.1 <= new_coords[1] <= orig_coords[1] + height*0.1) and (orig_coords[2] - width*0.1 <= new_coords[2] <= orig_coords[2] + width*0.1) and (orig_coords[3] - height*0.1 <= new_coords[3] <= orig_coords[3] + height*0.1)
+    if not scale:
+        return (orig_coords[0] - width*0.1 <= new_coords[0] <= orig_coords[0] + width*0.1) and (orig_coords[1] - height*0.1 <= new_coords[1] <= orig_coords[1] + height*0.1) and (orig_coords[2] - width*0.1 <= new_coords[2] <= orig_coords[2] + width*0.1) and (orig_coords[3] - height*0.1 <= new_coords[3] <= orig_coords[3] + height*0.1)
+    else:
+        old_width = abs(orig_coords[2] - orig_coords[0])
+        scale_factor = width / old_width
+        new_top_left_x = int(orig_coords[0]*scale_factor)
+        new_top_left_y = int(orig_coords[1]*scale_factor)
+        new_bot_right_x = int((orig_coords[0]*scale_factor) + width)
+        new_bot_right_y = int((orig_coords[1]*scale_factor) + height)
+        return (new_top_left_x - width*0.1 <= new_coords[0] <= new_top_left_x + width*0.1) and (new_top_left_y - height*0.1 <= new_coords[1] <= new_top_left_y + height*0.1) and (new_bot_right_x - width*0.1 <= new_coords[2] <= new_bot_right_x + width*0.1) and (new_bot_right_y - height*0.1 <= new_coords[3] <- new_bot_right_y + height*0.1)
 
 def haar_cascade(img):
     ''' inputs:     img, the pathname of the img
