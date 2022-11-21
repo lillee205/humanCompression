@@ -77,9 +77,9 @@ def main(portraits, option = "color_quantization"):
                 print(f"not a human!!")
                 break
 
-# if __name__ == "__main__":
-#     # get array of portrait file names 
-#     path = "./photos"
-#     portraits = os.listdir(path)
-#     print(portraits)
-#     main(portraits)
+if __name__ == "__main__":
+    # get array of portrait file names 
+    path = "test_photos"
+    portraits = os.listdir(path)
+    print(portraits)
+    main(portraits)
