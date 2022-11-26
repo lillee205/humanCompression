@@ -20,7 +20,7 @@ def sampleImg(img, width, height):
         output: PIL img of newly sampled portrait
     """
     pilImg = Image.open(img)
-    finalImg = pilImg.resize((width, height),Image.LANCZOS)
+    finalImg = pilImg.resize((width, height),Image.Resampling.LANCZOS)
     pilImg.close()
     return finalImg
 
@@ -73,8 +73,12 @@ def haar_cascade(img):
     return (0, 0, 0, 0)
 
 def main(portraits, option = "color_quantization"):
+    flag = False
+    if option == "sampling":
+        flag = True
     # loop through each portrait
-    for portrait in portraits:        
+    for portrait in portraits:
+        print(f"Currently testing {portrait}")
         # run haar_cascade on orig file
 
         # make a copy of the file
@@ -87,12 +91,10 @@ def main(portraits, option = "color_quantization"):
         portrait = "./compress_photos/" + portrait
 
         orig_coordinates = haar_cascade(portrait)
-        
         while True: 
             # check if portrait is identifiable as human
-
-            if isHuman(portrait, orig_coordinates):
-                print(portrait)
+            
+            if isHuman(portrait, orig_coordinates, scale = flag):
                 if option == "color_quantization":
                     if numColors > 25:
                         break
@@ -116,6 +118,7 @@ def main(portraits, option = "color_quantization"):
                 elif option == "sampling":   
                     print(f"Sampling: Stopped being human at {percent*100}% reduction.")
                 break
+            print()
 
 if __name__ == "__main__":
     # get array of portrait file names 
