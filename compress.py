@@ -56,7 +56,7 @@ def haar_cascade(img):
     img = cv2.imread(img)
     faces = classifier.detectMultiScale(img) # result
     # to draw faces on image
-    print(faces)
+    #print(faces)
     if len(faces) > 0:
         result = faces[0]
         x, y, w, h = result
@@ -110,13 +110,17 @@ def main(portraits, option = "color_quantization"):
             # check if portrait is identifiable as human
             if isHuman(portrait, orig_coordinates, scale = flag):
                 if option == "color_quantization":
-                    if numColors <= 25:
+                    if numColors <= 2:
                         break
-                    numColors -= 25
+                    if numColors >= 25:
+                        numColors -= 15
+                    else:
+                        numColors -= 1
                     newImg = colorQuantizeImg(portrait, numColors)
                     newImg.save(portrait)
                     
                 elif option == "sampling":
+                    percent -= 0.1
                     newHeight = int(height * percent)
                     newWidth = int(width * percent)
 
@@ -124,7 +128,6 @@ def main(portraits, option = "color_quantization"):
                         break
                     newImg = sampleImg(portrait, newWidth, newHeight)
                     newImg.save(portrait)
-                    percent -= 0.1
                     
                 else:
                     print("Please pick either color_quantization or sampling.")
