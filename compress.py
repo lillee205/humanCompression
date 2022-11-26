@@ -42,8 +42,6 @@ def isHuman(img, orig_coords, scale = False):
         if old_width == 0:
             print("not human orig")
             return
-        # print("orig: ", orig_coords[2], orig_coords[0])
-        # print("old width:", old_width)
         scale_factor = width / old_width
 
         new_top_left_x = int(orig_coords[0]*scale_factor)
@@ -52,9 +50,7 @@ def isHuman(img, orig_coords, scale = False):
         new_bot_right_y = int((orig_coords[1]*scale_factor) + height)
 
         result = (new_top_left_x - width*0.1 <= new_coords[0] <= new_top_left_x + width*0.1) and (new_top_left_y - height*0.1 <= new_coords[1] <= new_top_left_y + height*0.1) and (new_bot_right_x - width*0.1 <= new_coords[2] <= new_bot_right_x + width*0.1) and (new_bot_right_y - height*0.1 <= new_coords[3] <= new_bot_right_y + height*0.1)
-        # print("scale coords: ", new_top_left_x, new_top_left_y, new_bot_right_x, new_bot_right_y)
-        # print("new coords: ", new_coords)
-        # print(result)
+
         return result
 
 def haar_cascade(img):
@@ -66,8 +62,8 @@ def haar_cascade(img):
 
     img = cv2.imread(img)
     faces = classifier.detectMultiScale(img) # result
+
     # to draw faces on image
-    #print(faces)
     if len(faces) > 0:
         result = faces[0]
         x, y, w, h = result
@@ -79,9 +75,7 @@ def haar_cascade(img):
   
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-
-        # cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
-        # print("haar_cascades: ", (x, y, x1, y1))
+        
         return (x, y, x1, y1) # top-left-x, top-left-y, bottom-right-x, bottom-right-y
     return (0, 0, 0, 0)
 
