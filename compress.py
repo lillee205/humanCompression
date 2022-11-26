@@ -19,8 +19,8 @@ def sampleImg(img, width, height):
                width, height are ints that represent new img size
         output: PIL img of newly sampled portrait
     """
-    pilImg = Image.open("./photos/" + img)
-    finalImg = piImg.resize((width, height),Image.ANTIALIAS)
+    pilImg = Image.open(img)
+    finalImg = pilImg.resize((width, height),Image.LANCZOS)
     pilImg.close()
     return finalImg
 
@@ -98,18 +98,23 @@ def main(portraits, option = "color_quantization"):
                         break
                     numColors -= 25
                     newImg = colorQuantizeImg(portrait, numColors)
-                    newImg.save("./compress_photos/" + portrait)
+                    newImg.save(portrait)
                 elif option == "sampling":
-                    if percent <= 0:
+                    newHeight = int(height * percent)
+                    newWidth = int(width * percent)
+                    if percent <= 0 or newHeight <= 0 or newWidth <= 0:
                         break
-                    newImg = sampleImg(portrait, width * percent, height *
-        percent)
-                    newImg.save("./compress_photos/" + portrait)
+                    newImg = sampleImg(portrait, newWidth, newHeight)
+                    newImg.save(portrait)
                     percent -= 0.1
                 else:
-                    print("invalid option")
+                    print("Please pick either color_quantization or sampling.")
+                    
             else:
-                print(f"not a human!!")
+                if option == "color_quantization":
+                    print(f"Color Quantization: Stopped being human at {numColors}")
+                elif option == "sampling":   
+                    print(f"Sampling: Stopped being human at {percent*100}% reduction.")
                 break
 
 if __name__ == "__main__":
@@ -117,4 +122,4 @@ if __name__ == "__main__":
     path = "./photos/"
     portraits = os.listdir(path)
     print(portraits)
-    main(portraits)
+    main(portraits, "sampling")
