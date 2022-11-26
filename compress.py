@@ -121,6 +121,7 @@ def main(portraits, option = "color_quantization"):
             if isHuman(portrait, orig_coordinates, scale = flag):
                 if option == "color_quantization":
                     if numColors <= 2:
+                        data[-1] = [portrait, "always human!"]
                         break
                     if numColors >= 25:
                         numColors -= 15
@@ -130,11 +131,12 @@ def main(portraits, option = "color_quantization"):
                     newImg.save(portrait)
                     
                 elif option == "sampling":
-                    percent -= 0.1
+                    percent -= 0.05
                     newHeight = int(height * percent)
                     newWidth = int(width * percent)
 
                     if percent <= 0 or newHeight <= 0 or newWidth <= 0:
+                        data[-1] = [portrait, "always human!"]
                         break
                     newImg = sampleImg(portrait, newWidth, newHeight)
                     newImg.save(portrait)
@@ -163,4 +165,4 @@ if __name__ == "__main__":
     # get array of portrait file names 
     path = "./photos/"
     portraits = os.listdir(path)
-    main(portraits, option="sampling")
+    main(portraits, "sampling")
