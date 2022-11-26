@@ -74,14 +74,14 @@ def haar_cascade(img):
         x1, y1 = x + w, y + h
 
         # testing
-        cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
-        cv2.imshow('image', img)
+        # cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
+        # cv2.imshow('image', img)
   
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
         # cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
-        print("haar_cascades: ", (x, y, x1, y1))
+        # print("haar_cascades: ", (x, y, x1, y1))
         return (x, y, x1, y1) # top-left-x, top-left-y, bottom-right-x, bottom-right-y
     return (0, 0, 0, 0)
 
@@ -118,6 +118,10 @@ def main(portraits, option = "color_quantization"):
         portrait = "./compress_photos/" + portrait
 
         orig_coordinates = haar_cascade(portrait)
+        if orig_coordinates == (0,0,0,0):
+            print("no human here")
+            data[-1] = [portrait, "n.a"]
+            continue
         while True: 
             # check if portrait is identifiable as human
             if isHuman(portrait, orig_coordinates, scale = flag):
@@ -165,4 +169,4 @@ if __name__ == "__main__":
     # get array of portrait file names 
     path = "./photos/"
     portraits = os.listdir(path)
-    main(portraits)
+    main(portraits, option="sampling")
