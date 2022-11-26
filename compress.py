@@ -2,13 +2,14 @@ from PIL import Image
 import os 
 import shutil
 import cv2
+import csv
 
 def colorQuantizeImg(img, numColors):
     """ input: img is a string representing a filename to a portrait
                numColors is an int saying how many colors we want
         output: PIL img of newly color quantized portrait
     """
-    pilImg = Image.open("./photos/" + img) 
+    pilImg = Image.open(img) 
     compImg = pilImg.quantize(colors=numColors, method = None, kmeans = 0,
     palette = None).convert('RGB')
     pilImg.close()
@@ -73,18 +74,32 @@ def haar_cascade(img):
     return (0, 0, 0, 0)
 
 def main(portraits, option = "color_quantization"):
+    
+    # set up CSV for data collection
+    header = ["filename"]
+    
+    if option == "color_quantization":
+        header.append("at what # of colors is the human no longer recognizable?")
+        
+    elif option == "sampling":
+        header.append("at what % compression is the human no longer recognizable?")
+        
+    data = []
+    
     flag = False
     if option == "sampling":
         flag = True
+    
     # loop through each portrait
     for portrait in portraits:
+        data.append([portrait])
+        print()
         print(f"Currently testing {portrait}")
         # run haar_cascade on orig file
-
         # make a copy of the file
         shutil.copyfile("./photos/" + portrait, "./compress_photos/" + portrait)
-        numColors = 255
         portraitPil = Image.open("./photos/" + portrait)
+        numColors = 255
         width, height = portraitPil.size
         percent = 1
         portraitPil.close()
@@ -93,36 +108,46 @@ def main(portraits, option = "color_quantization"):
         orig_coordinates = haar_cascade(portrait)
         while True: 
             # check if portrait is identifiable as human
-            
             if isHuman(portrait, orig_coordinates, scale = flag):
                 if option == "color_quantization":
-                    if numColors > 25:
+                    if numColors <= 25:
                         break
                     numColors -= 25
                     newImg = colorQuantizeImg(portrait, numColors)
                     newImg.save(portrait)
+                    
                 elif option == "sampling":
                     newHeight = int(height * percent)
                     newWidth = int(width * percent)
+
                     if percent <= 0 or newHeight <= 0 or newWidth <= 0:
                         break
                     newImg = sampleImg(portrait, newWidth, newHeight)
                     newImg.save(portrait)
                     percent -= 0.1
+                    
                 else:
                     print("Please pick either color_quantization or sampling.")
-                    
             else:
                 if option == "color_quantization":
                     print(f"Color Quantization: Stopped being human at {numColors}")
+                    data[-1]= [portrait, numColors]
                 elif option == "sampling":   
-                    print(f"Sampling: Stopped being human at {percent*100}% reduction.")
+                    print(f"Sampling: Stopped being human at {percent*100}% compression.")
+                    data[-1] = [portrait, percent * 100]
                 break
-            print()
+        
+    with open(f'{option}.csv', 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        
+        # write the header
+        writer.writerow(header)
+            
+        # write multiple rows
+        writer.writerows(data)
 
 if __name__ == "__main__":
     # get array of portrait file names 
     path = "./photos/"
     portraits = os.listdir(path)
-    print(portraits)
-    main(portraits, "sampling")
+    main(portraits)
